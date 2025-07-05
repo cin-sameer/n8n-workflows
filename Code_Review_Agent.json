@@ -9,26 +9,20 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [
-        -220,
-        -280
-      ],
-      "id": "3a390ab2-893b-4bad-a3dc-015dc485bc5c",
+      "position": [-220, -280],
+      "id": "webhook-node-id",
       "name": "Webhook",
-      "webhookId": "<REDACTED>"
+      "webhookId": "<YOUR_WEBHOOK_ID>"
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Extract full repo name and changed file from GitHub push webhook\nconst repo = $json.repository?.full_name || \"sameer21-code/cods\";\nconst files = $json.head_commit?.modified || $json.head_commit?.added || [\"code.py\"];  // fallback\n\nif (!repo || files.length === 0) {\n  return {\n    json: {\n      message: \"No repo or files detected\",\n      repo,\n      files: []\n    }\n  };\n}\n\nconst file = files[0];  // Only taking first file\n\nreturn {\n  json: {\n    file,\n    repo,\n    apiUrl: `https://api.github.com/repos/${repo}/contents/${file}`\n  }\n};\n"
+        "jsCode": "// Extract full repo name and changed file from GitHub push webhook\nconst repo = $json.repository?.full_name || \"user/repo-name\";\nconst files = $json.head_commit?.modified || $json.head_commit?.added || [\"code.py\"];\n\nif (!repo || files.length === 0) {\n  return {\n    json: {\n      message: \"No repo or files detected\",\n      repo,\n      files: []\n    }\n  };\n}\n\nconst file = files[0];\n\nreturn {\n  json: {\n    file,\n    repo,\n    apiUrl: `https://api.github.com/repos/${repo}/contents/${file}`\n  }\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        -40,
-        -280
-      ],
-      "id": "30488979-296e-4c4c-9017-c7159ff09411",
+      "position": [-40, -280],
+      "id": "code-node-id",
       "name": "Code"
     },
     {
@@ -39,11 +33,11 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "<REDACTED>"
+              "value": "Bearer <YOUR_GITHUB_TOKEN>"
             },
             {
               "name": "Accept",
-              "value": "<REDACTED>"
+              "value": "application/vnd.github.v3+json"
             }
           ]
         },
@@ -51,11 +45,8 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        140,
-        -280
-      ],
-      "id": "8313c268-15ea-4471-a825-d04db780ff9b",
+      "position": [140, -280],
+      "id": "http-node-id",
       "name": "HTTP Request"
     },
     {
@@ -79,319 +70,49 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [
-        320,
-        -280
-      ],
-      "id": "12598452-4f1f-4bf4-b075-1aeb18d211fb",
+      "position": [320, -280],
+      "id": "openai-node-id",
       "name": "Message a model",
       "credentials": {
-        "openAiApi": "<REDACTED>"
+        "openAiApi": "<YOUR_OPENAI_API_KEY>"
       }
     },
     {
       "parameters": {
-        "chatId": "<REDACTED>",
+        "chatId": "<YOUR_TELEGRAM_CHAT_ID>",
         "text": "=\ud83d\udcc4 *Code Review Report:*\n\n*File:* {{$node[\"Code\"].json[\"file\"] || \"Unknown\"}}\n\n*Score:* {{$node[\"Message a model\"].json[\"choices\"][0][\"message\"][\"content\"][\"quality_score\"]}}\n\n*Explanation:* {{$node[\"Message a model\"].json[\"choices\"][0][\"message\"][\"content\"][\"explanation\"]}}\n\n*Suggestions:*\n{{ $node[\"Message a model\"].json[\"choices\"][0][\"message\"][\"content\"][\"suggestions\"].map(s => '- ' + s).join('\\n') }}\n",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [
-        220,
-        -100
-      ],
-      "id": "c5b5f410-efa0-4086-a7cd-ffd5cff58d9c",
+      "position": [220, -100],
+      "id": "telegram-node-id",
       "name": "Send a text message",
-      "webhookId": "<REDACTED>",
-      "alwaysOutputData": false,
+      "webhookId": "<YOUR_WEBHOOK_ID>",
       "credentials": {
-        "telegramApi": "<REDACTED>"
+        "telegramApi": "<YOUR_TELEGRAM_BOT_TOKEN>"
       }
     }
   ],
-  "pinData": {
-    "Webhook": [
-      {
-        "json": {
-          "headers": {
-            "host": "sameer123456.app.n8n.cloud",
-            "user-agent": "GitHub-Hookshot/2bbfd1f",
-            "content-length": "7407",
-            "accept": "*/*",
-            "accept-encoding": "gzip, br",
-            "cdn-loop": "cloudflare; loops=1; subreqs=1",
-            "cf-connecting-ip": "140.82.115.59",
-            "cf-ew-via": "15",
-            "cf-ipcountry": "US",
-            "cf-ray": "957fa55790d6d653-IAD",
-            "cf-visitor": "{\"scheme\":\"https\"}",
-            "cf-worker": "n8n.cloud",
-            "content-type": "application/json",
-            "x-forwarded-for": "140.82.115.59, 172.70.34.96",
-            "x-forwarded-host": "sameer123456.app.n8n.cloud",
-            "x-forwarded-port": "443",
-            "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-76-b4b8c88f-tkrcr",
-            "x-github-delivery": "1e56cc7a-55de-11f0-8687-cfb289413c47",
-            "x-github-event": "push",
-            "x-github-hook-id": "555250239",
-            "x-github-hook-installation-target-id": "1010689161",
-            "x-github-hook-installation-target-type": "repository",
-            "x-is-trusted": "yes",
-            "x-real-ip": "140.82.115.59"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "ref": "refs/heads/main",
-            "before": "4662d27d15af3ae6a71a65ef5fc0d334589f645b",
-            "after": "bbbcecbc16999f62a38bbd56757b1f531901e140",
-            "repository": {
-              "id": 1010689161,
-              "node_id": "R_kgDOPD3kiQ",
-              "name": "cods",
-              "full_name": "sameer21-code/cods",
-              "private": false,
-              "owner": {
-                "name": "sameer21-code",
-                "email": "letsexplore4624@gmail.com",
-                "login": "sameer21-code",
-                "id": 218487693,
-                "node_id": "U_kgDODQXbjQ",
-                "avatar_url": "https://avatars.githubusercontent.com/u/218487693?v=4",
-                "gravatar_id": "",
-                "url": "https://api.github.com/users/sameer21-code",
-                "html_url": "https://github.com/sameer21-code",
-                "followers_url": "https://api.github.com/users/sameer21-code/followers",
-                "following_url": "https://api.github.com/users/sameer21-code/following{/other_user}",
-                "gists_url": "https://api.github.com/users/sameer21-code/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/sameer21-code/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/sameer21-code/subscriptions",
-                "organizations_url": "https://api.github.com/users/sameer21-code/orgs",
-                "repos_url": "https://api.github.com/users/sameer21-code/repos",
-                "events_url": "https://api.github.com/users/sameer21-code/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/sameer21-code/received_events",
-                "type": "User",
-                "user_view_type": "public",
-                "site_admin": false
-              },
-              "html_url": "https://github.com/sameer21-code/cods",
-              "description": null,
-              "fork": false,
-              "url": "https://api.github.com/repos/sameer21-code/cods",
-              "forks_url": "https://api.github.com/repos/sameer21-code/cods/forks",
-              "keys_url": "https://api.github.com/repos/sameer21-code/cods/keys{/key_id}",
-              "collaborators_url": "https://api.github.com/repos/sameer21-code/cods/collaborators{/collaborator}",
-              "teams_url": "https://api.github.com/repos/sameer21-code/cods/teams",
-              "hooks_url": "https://api.github.com/repos/sameer21-code/cods/hooks",
-              "issue_events_url": "https://api.github.com/repos/sameer21-code/cods/issues/events{/number}",
-              "events_url": "https://api.github.com/repos/sameer21-code/cods/events",
-              "assignees_url": "https://api.github.com/repos/sameer21-code/cods/assignees{/user}",
-              "branches_url": "https://api.github.com/repos/sameer21-code/cods/branches{/branch}",
-              "tags_url": "https://api.github.com/repos/sameer21-code/cods/tags",
-              "blobs_url": "https://api.github.com/repos/sameer21-code/cods/git/blobs{/sha}",
-              "git_tags_url": "https://api.github.com/repos/sameer21-code/cods/git/tags{/sha}",
-              "git_refs_url": "https://api.github.com/repos/sameer21-code/cods/git/refs{/sha}",
-              "trees_url": "https://api.github.com/repos/sameer21-code/cods/git/trees{/sha}",
-              "statuses_url": "https://api.github.com/repos/sameer21-code/cods/statuses/{sha}",
-              "languages_url": "https://api.github.com/repos/sameer21-code/cods/languages",
-              "stargazers_url": "https://api.github.com/repos/sameer21-code/cods/stargazers",
-              "contributors_url": "https://api.github.com/repos/sameer21-code/cods/contributors",
-              "subscribers_url": "https://api.github.com/repos/sameer21-code/cods/subscribers",
-              "subscription_url": "https://api.github.com/repos/sameer21-code/cods/subscription",
-              "commits_url": "https://api.github.com/repos/sameer21-code/cods/commits{/sha}",
-              "git_commits_url": "https://api.github.com/repos/sameer21-code/cods/git/commits{/sha}",
-              "comments_url": "https://api.github.com/repos/sameer21-code/cods/comments{/number}",
-              "issue_comment_url": "https://api.github.com/repos/sameer21-code/cods/issues/comments{/number}",
-              "contents_url": "https://api.github.com/repos/sameer21-code/cods/contents/{+path}",
-              "compare_url": "https://api.github.com/repos/sameer21-code/cods/compare/{base}...{head}",
-              "merges_url": "https://api.github.com/repos/sameer21-code/cods/merges",
-              "archive_url": "https://api.github.com/repos/sameer21-code/cods/{archive_format}{/ref}",
-              "downloads_url": "https://api.github.com/repos/sameer21-code/cods/downloads",
-              "issues_url": "https://api.github.com/repos/sameer21-code/cods/issues{/number}",
-              "pulls_url": "https://api.github.com/repos/sameer21-code/cods/pulls{/number}",
-              "milestones_url": "https://api.github.com/repos/sameer21-code/cods/milestones{/number}",
-              "notifications_url": "https://api.github.com/repos/sameer21-code/cods/notifications{?since,all,participating}",
-              "labels_url": "https://api.github.com/repos/sameer21-code/cods/labels{/name}",
-              "releases_url": "https://api.github.com/repos/sameer21-code/cods/releases{/id}",
-              "deployments_url": "https://api.github.com/repos/sameer21-code/cods/deployments",
-              "created_at": 1751212324,
-              "updated_at": "2025-06-30T18:06:08Z",
-              "pushed_at": 1751307292,
-              "git_url": "git://github.com/sameer21-code/cods.git",
-              "ssh_url": "git@github.com:sameer21-code/cods.git",
-              "clone_url": "https://github.com/sameer21-code/cods.git",
-              "svn_url": "https://github.com/sameer21-code/cods",
-              "homepage": null,
-              "size": 4,
-              "stargazers_count": 0,
-              "watchers_count": 0,
-              "language": "Python",
-              "has_issues": true,
-              "has_projects": true,
-              "has_downloads": true,
-              "has_wiki": true,
-              "has_pages": false,
-              "has_discussions": false,
-              "forks_count": 0,
-              "mirror_url": null,
-              "archived": false,
-              "disabled": false,
-              "open_issues_count": 0,
-              "license": null,
-              "allow_forking": true,
-              "is_template": false,
-              "web_commit_signoff_required": false,
-              "topics": [],
-              "visibility": "public",
-              "forks": 0,
-              "open_issues": 0,
-              "watchers": 0,
-              "default_branch": "main",
-              "stargazers": 0,
-              "master_branch": "main"
-            },
-            "pusher": {
-              "name": "sameer21-code",
-              "email": "letsexplore4624@gmail.com"
-            },
-            "sender": {
-              "login": "sameer21-code",
-              "id": 218487693,
-              "node_id": "U_kgDODQXbjQ",
-              "avatar_url": "https://avatars.githubusercontent.com/u/218487693?v=4",
-              "gravatar_id": "",
-              "url": "https://api.github.com/users/sameer21-code",
-              "html_url": "https://github.com/sameer21-code",
-              "followers_url": "https://api.github.com/users/sameer21-code/followers",
-              "following_url": "https://api.github.com/users/sameer21-code/following{/other_user}",
-              "gists_url": "https://api.github.com/users/sameer21-code/gists{/gist_id}",
-              "starred_url": "https://api.github.com/users/sameer21-code/starred{/owner}{/repo}",
-              "subscriptions_url": "https://api.github.com/users/sameer21-code/subscriptions",
-              "organizations_url": "https://api.github.com/users/sameer21-code/orgs",
-              "repos_url": "https://api.github.com/users/sameer21-code/repos",
-              "events_url": "https://api.github.com/users/sameer21-code/events{/privacy}",
-              "received_events_url": "https://api.github.com/users/sameer21-code/received_events",
-              "type": "User",
-              "user_view_type": "public",
-              "site_admin": false
-            },
-            "created": false,
-            "deleted": false,
-            "forced": false,
-            "base_ref": null,
-            "compare": "https://github.com/sameer21-code/cods/compare/4662d27d15af...bbbcecbc1699",
-            "commits": [
-              {
-                "id": "bbbcecbc16999f62a38bbd56757b1f531901e140",
-                "tree_id": "56a6770e467b6b341eed077d9968173d164f4371",
-                "distinct": true,
-                "message": "Create final.py",
-                "timestamp": "2025-06-30T23:44:52+05:30",
-                "url": "https://github.com/sameer21-code/cods/commit/bbbcecbc16999f62a38bbd56757b1f531901e140",
-                "author": {
-                  "name": "sameer21-code",
-                  "email": "letsexplore4624@gmail.com",
-                  "username": "sameer21-code"
-                },
-                "committer": {
-                  "name": "GitHub",
-                  "email": "noreply@github.com",
-                  "username": "web-flow"
-                },
-                "added": [
-                  "final.py"
-                ],
-                "removed": [],
-                "modified": []
-              }
-            ],
-            "head_commit": {
-              "id": "bbbcecbc16999f62a38bbd56757b1f531901e140",
-              "tree_id": "56a6770e467b6b341eed077d9968173d164f4371",
-              "distinct": true,
-              "message": "Create final.py",
-              "timestamp": "2025-06-30T23:44:52+05:30",
-              "url": "https://github.com/sameer21-code/cods/commit/bbbcecbc16999f62a38bbd56757b1f531901e140",
-              "author": {
-                "name": "sameer21-code",
-                "email": "letsexplore4624@gmail.com",
-                "username": "sameer21-code"
-              },
-              "committer": {
-                "name": "GitHub",
-                "email": "noreply@github.com",
-                "username": "web-flow"
-              },
-              "added": [
-                "final.py"
-              ],
-              "removed": [],
-              "modified": []
-            }
-          },
-          "webhookUrl": "https://sameer123456.app.n8n.cloud/webhook/github-code",
-          "executionMode": "production"
-        }
-      }
-    ]
-  },
   "connections": {
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Code",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Code", "type": "main", "index": 0 }]]
     },
     "Code": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "HTTP Request", "type": "main", "index": 0 }]]
     },
     "HTTP Request": {
-      "main": [
-        [
-          {
-            "node": "Message a model",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Message a model", "type": "main", "index": 0 }]]
     },
     "Message a model": {
-      "main": [
-        [
-          {
-            "node": "Send a text message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Send a text message", "type": "main", "index": 0 }]]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "59c6bc68-07b9-4c1f-b356-652fb4e8b092",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "45c9fbd0b299935e2d15ef6500224d702155d9bc323228a85dd66dc10b4710d4"
-  },
-  "id": "D809Fj2vwYe3FdEY",
+  "versionId": "your-version-id",
+  "id": "workflow-id",
   "tags": []
 }
